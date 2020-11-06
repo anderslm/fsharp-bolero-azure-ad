@@ -1,0 +1,63 @@
+@page "/"
+@namespace AzureAd.Bolero.Server.Pages
+@using global::Bolero.Server.RazorHost
+@using Microsoft.Extensions.Configuration
+@inject IBoleroHostConfig BoleroHostConfig
+@inject IConfiguration Configuration
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bolero Application</title>
+    <base href="/">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+    <link rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="https://alcdn.msauth.net/lib/1.1.3/js/msal.js" integrity="sha384-m/3NDUcz4krpIIiHgpeO0O8uxSghb+lfBTngquAo2Zuy2fEF+YgFeP08PWFo5FiJ" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        const msalConfig = {
+            auth: {
+                clientId: "@Configuration["ClientId"]",
+                authority: "@Configuration["Authority"]",
+                validateAuthority: false,
+                redirectUri: "@Configuration["RedirectUri"]"
+            },
+            cache: {
+                cacheLocation: "localStorage",
+                storeAuthStateInCookie: false
+            }
+        };
+        
+        const msalInstance = new Msal.UserAgentApplication(msalConfig);
+        msalInstance.handleRedirectCallback((error, response) => {
+            // if error is not null, something went wrong
+            // if not, response is a successful login response
+        });
+        
+        const loginRequest = {
+            scopes: ["@Configuration["Scope"]"]
+        };
+        
+        function acquireTokenSilent () {
+            return msalInstance.acquireTokenSilent(loginRequest);
+        }
+        
+        function login () {
+            return msalInstance.loginPopup(loginRequest);
+        }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item has-text-weight-bold is-size-5" href="https://fsbolero.io">
+          <img style="height:40px" src="https://github.com/fsbolero/website/raw/master/src/Website/img/wasm-fsharp.png" />
+          &nbsp;
+          Bolero
+        </a>
+      </div>
+    </nav>
+    <div id="main">@(await Html.RenderComponentAsync<Web.Main.MyApp>(BoleroHostConfig))</div>
+    @Html.RenderBoleroScript(BoleroHostConfig)
+  </body>
+</html>

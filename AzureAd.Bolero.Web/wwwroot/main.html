@@ -1,0 +1,27 @@
+<div class="columns">
+  <aside class="column sidebar is-narrow">
+    <section class="section">
+      <nav class="menu">
+        <ul class="menu-list">
+          ${Menu}
+          <template id="MenuItem">
+            <li><a class="${Active}" href="${Url}">${Text}</a></li>
+          </template>
+        </ul>
+      </nav>
+    </section>
+  </aside>
+  <div class="column">
+    <section class="section">
+      ${Body}
+
+      <template id="Home">
+        <div class="content">
+          <h1 class="title">Welcome to Bolero!</h1>
+          <p>This application demonstrates how to login using MSAL.js.</p>
+        </div>
+      </template>
+
+    </section>
+  </div>
+</div>
