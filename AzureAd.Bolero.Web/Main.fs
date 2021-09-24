@@ -54,6 +54,11 @@ let view model _ =
             cond model.Page <| function
             | Home -> Main.Home().Elt()
         )
+        .Greeting(
+                cond model.LoginState.Token <| function
+                | Some token -> text $"Hello {token.Account.Username}"
+                | None -> empty
+        )
         .Elt()
 
 type MyApp() =

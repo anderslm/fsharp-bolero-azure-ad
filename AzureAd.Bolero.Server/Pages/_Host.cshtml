@@ -13,7 +13,7 @@
     <base href="/">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
     <link rel="stylesheet" href="css/index.css">
-    <script type="text/javascript" src="https://alcdn.msauth.net/lib/1.1.3/js/msal.js" integrity="sha384-m/3NDUcz4krpIIiHgpeO0O8uxSghb+lfBTngquAo2Zuy2fEF+YgFeP08PWFo5FiJ" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://alcdn.msauth.net/browser/2.16.1/js/msal-browser.min.js"></script>
     <script type="text/javascript">
         const msalConfig = {
             auth: {
@@ -28,22 +28,28 @@
             }
         };
         
-        const msalInstance = new Msal.UserAgentApplication(msalConfig);
-        msalInstance.handleRedirectCallback((error, response) => {
-            // if error is not null, something went wrong
-            // if not, response is a successful login response
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
+        msalInstance.handleRedirectPromise().then((tokenResponse) => {
+            // Check if the tokenResponse is null
+            // If the tokenResponse !== null, then you are coming back from a successful authentication redirect. 
+            // If the tokenResponse === null, you are not coming back from an auth redirect.
+        }).catch((error) => {
+            // handle error, either in the library or coming back from the server 
         });
         
         const loginRequest = {
             scopes: ["@Configuration["Scope"]"]
         };
         
-        function acquireTokenSilent () {
-            return msalInstance.acquireTokenSilent(loginRequest);
+        async function acquireTokenSilent () {
+            return await msalInstance.acquireTokenSilent(loginRequest).catch(async (error) => {
+              // fallbck to interaction when silent call fails
+              return await msalInstance.acquireTokenPopup(loginRequest);
+            });
         }
         
-        function login () {
-            return msalInstance.loginPopup(loginRequest);
+        async function login () {
+            return await msalInstance.loginPopup(loginRequest);
         }
     </script>
   </head>
